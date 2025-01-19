@@ -8,6 +8,8 @@ import {
   Typography,
   Paper,
   Grid,
+  Snackbar, // Snackbar for displaying messages
+  Alert, // Alert component from MUI
 } from '@mui/material';
 
 const StockForm = () => {
@@ -19,6 +21,9 @@ const StockForm = () => {
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState(''); // State for success message
+  const [errorMessage, setErrorMessage] = useState(''); // State for error message
+  const [openSnackbar, setOpenSnackbar] = useState(false); // Snackbar visibility
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -34,14 +39,22 @@ const StockForm = () => {
         quantity: parseFloat(stock.quantity) || 0,
         buyPrice: parseFloat(stock.buyPrice) || 0,
       });
-      alert('Stock added successfully!');
+      setSuccessMessage('Stock added successfully!');
+      setOpenSnackbar(true); // Show snackbar on success
       setStock({ name: '', ticker: '', quantity: '', buyPrice: '' }); // Reset form
+      setErrorMessage(''); // Reset error message if stock is successfully added
     } catch (error) {
       console.error(error);
-      alert('Error adding stock!');
+      setErrorMessage('Error adding stock. Please try again!');
+      setOpenSnackbar(true); // Show snackbar on error
+      setSuccessMessage(''); // Reset success message if there's an error
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
   };
 
   return (
@@ -156,6 +169,17 @@ const StockForm = () => {
           </Box>
         </form>
       </Paper>
+
+      {/* Snackbar for success or error message */}
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={errorMessage ? 'error' : 'success'} sx={{ width: '100%' }}>
+          {errorMessage || successMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
